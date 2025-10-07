@@ -136,7 +136,7 @@ void deleteUser(){
 
     int id ,found=0;
     User u ;
-    printf("Enter User ID to delete: ");
+    printf("Enter User ID to Delete: ");
     scanf("%d",&id);
 
     while(fscanf(fp,"%d,%49[^,],%d\n",&u.id,u.name,&u.age)==3)
