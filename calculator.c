@@ -8,12 +8,23 @@ int precedence(char op) {
 }
 
 int calculate(int a, int b, char op) {
-    if (op == '+') {return a + b;}
-    if (op == '-') {return a - b;}
-    if (op == '*') {return a * b;}
-    if (op == '/') {
-        if (b == 0) { 
-            printf("Cannot divide by 0\n")    ;    
+    if (op == '+') 
+    {
+        return a + b;
+    }
+    if (op == '-') 
+    {
+        return a - b;
+    }
+    if (op == '*') 
+    {
+        return a * b;
+    }
+    if (op == '/') 
+    {
+        if (b == 0) 
+        { 
+            printf("Cannot divide by 0\n");    
             return 0;
         }
         return a / b;        
@@ -74,3 +85,4 @@ int main(){
     process(input);
     return 0;
 }
+
