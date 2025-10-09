@@ -4,13 +4,15 @@
 
 #define FILENAME "users.txt"
 
-typedef struct {
+typedef struct
+{
     int id;
     char name[50];
     int age;
 }User;
 
-enum CrudOperation {
+enum CrudOperation
+{
     ADD_USER = 1,
     DISPLAY_USERS = 2,
     UPDATE_USER = 3,
@@ -18,34 +20,43 @@ enum CrudOperation {
     EXIT_PROGRAM = 5
 };
 
-
-
-FILE* openFile(const char *mode) {
+FILE *openFile(const char *mode)
+{
     FILE *filePointer = fopen(FILENAME, mode);
-    if (filePointer == NULL) {
+    if (filePointer == NULL)
+    {
         printf("Error opening file.\n");
         return NULL;
     }
     return filePointer;
 }
 
-void closeFile(FILE *filePointer) {
+void closeFile(FILE *filePointer)
+{
     if (filePointer != NULL)
+    {
         fclose(filePointer);
+    }
 }
 
-void ensureFileExists() {
+void ensureFileExists()
+{
     FILE *filePointer = fopen(FILENAME, "a+");
-    if (filePointer == NULL) {
+    if (filePointer == NULL)
+    {
         printf("File error\n");
         exit(1);
     }
     fclose(filePointer);
 }
 
-void createUser() {
+void createUser()
+{
     FILE *filePointer = openFile("a");
-    if (filePointer == NULL) return;
+    if (filePointer == NULL)
+    {
+        return;
+    }
 
     User user;
     printf("Enter User ID : ");
@@ -61,23 +72,28 @@ void createUser() {
     printf("User added!\n");
 }
 
-void readUsers() {
+void readUsers()
+{
     FILE *filePointer = openFile("r");
-    if (filePointer == NULL) return;
+    if (filePointer == NULL)
+        return;
 
     User user;
     printf("\n--- User Records ---\n");
-    while (fscanf(filePointer, "%d,%49[^,],%d\n", &user.id, user.name, &user.age) == 3) {
+    while (fscanf(filePointer, "%d,%49[^,],%d\n", &user.id, user.name, &user.age) == 3)
+    {
         printf("ID:%d  Name:%s  Age:%d\n", user.id, user.name, user.age);
     }
 
     closeFile(filePointer);
 }
 
-void updateUser() {
+void updateUser()
+{
     FILE *filePointer = openFile("r");
     FILE *tempFilePointer = fopen("temp.txt", "w");
-    if (filePointer == NULL || tempFilePointer == NULL) {
+    if (filePointer == NULL || tempFilePointer == NULL)
+    {
         printf("Error opening file\n");
         return;
     }
@@ -87,8 +103,10 @@ void updateUser() {
     printf("Enter User ID to update: ");
     scanf("%d", &userId);
 
-    while (fscanf(filePointer, "%d,%49[^,],%d\n", &user.id, user.name, &user.age) == 3) {
-        if (user.id == userId) {
+    while (fscanf(filePointer, "%d,%49[^,],%d\n", &user.id, user.name, &user.age) == 3)
+    {
+        if (user.id == userId)
+        {
             isFound = 1;
             printf("Enter new name : ");
             scanf("%s", user.name);
@@ -104,15 +122,21 @@ void updateUser() {
     rename("temp.txt", FILENAME);
 
     if (isFound)
+    {
         printf("Updated!\n");
+    }
     else
+    {
         printf("Not found!\n");
+    }
 }
 
-void deleteUser() {
+void deleteUser()
+{
     FILE *filePointer = openFile("r");
     FILE *tempFilePointer = fopen("temp.txt", "w");
-    if (filePointer == NULL || tempFilePointer == NULL) {
+    if (filePointer == NULL || tempFilePointer == NULL)
+    {
         printf("Error opening file\n");
         return;
     }
@@ -122,8 +146,10 @@ void deleteUser() {
     printf("Enter User ID to Delete: ");
     scanf("%d", &userId);
 
-    while (fscanf(filePointer, "%d,%49[^,],%d\n", &user.id, user.name, &user.age) == 3) {
-        if (user.id == userId) {
+    while (fscanf(filePointer, "%d,%49[^,],%d\n", &user.id, user.name, &user.age) == 3)
+    {
+        if (user.id == userId)
+        {
             isFound = 1;
             continue;
         }
@@ -136,20 +162,25 @@ void deleteUser() {
     rename("temp.txt", FILENAME);
 
     if (isFound)
+    {
         printf("Deleted!\n");
+    }
     else
+    {
         printf("Not found!\n");
+    }
 }
 
-
-int main() {
+int main()
+{
     int userChoice;
     enum CrudOperation selectedOperation;
     int isRunning = 1;
 
     ensureFileExists();
 
-    while (isRunning) {
+    while (isRunning)
+    {
         printf("\n==== User Management System ====\n");
         printf("1. Add User (Create)\n");
         printf("2. Display Users (Read)\n");
@@ -161,30 +192,31 @@ int main() {
 
         selectedOperation = (enum CrudOperation)userChoice;
 
-        switch (selectedOperation) {
-            case ADD_USER:
-                        createUser();
-                        break;
+        switch (selectedOperation)
+        {
+        case ADD_USER:
+            createUser();
+            break;
 
-            case DISPLAY_USERS:
-                        readUsers();
-                        break;
+        case DISPLAY_USERS:
+            readUsers();
+            break;
 
-            case UPDATE_USER:
-                        updateUser();
-                        break;
+        case UPDATE_USER:
+            updateUser();
+            break;
 
-            case DELETE_USER:
-                        deleteUser();
-                        break;
+        case DELETE_USER:
+            deleteUser();
+            break;
 
-            case EXIT_PROGRAM:
-                        printf("Exiting program...\n");
-                        isRunning = 0;
-                        break;
+        case EXIT_PROGRAM:
+            printf("Exiting program...\n");
+            isRunning = 0;
+            break;
 
-            default:
-                        printf("Invalid choice\n");
+        default:
+            printf("Invalid choice\n");
         }
     }
 
