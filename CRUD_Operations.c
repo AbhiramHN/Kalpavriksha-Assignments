@@ -75,7 +75,8 @@ void createUser()
 void readUsers()
 {
     FILE *filePointer = openFile("r");
-    if (filePointer == NULL){
+    if (filePointer == NULL)
+    {
         return;
     }
 
