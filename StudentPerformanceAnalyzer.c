@@ -7,7 +7,7 @@ struct Student
     int mark1, mark2, mark3;
 };
 
-char GradeCalculator(float averageMarks)
+char GradeCalculator(const float averageMarks)
 {
     char grade;
     if (averageMarks >= 85)
@@ -33,33 +33,31 @@ char GradeCalculator(float averageMarks)
     return grade;
 }
 
-const char *GetStar(char grade)
+const char *GetStar(const char grade)
 {
     const char *stars;
-    if (grade == 'A')
+    switch (grade)
     {
+    case 'A':
         stars = "*****";
-    }
-    else if (grade == 'B')
-    {
+        break;
+    case 'B':
         stars = "****";
-    }
-    else if (grade == 'C')
-    {
+        break;
+    case 'C':
         stars = "***";
-    }
-    else if (grade == 'D')
-    {
+        break;
+    case 'D':
         stars = "**";
-    }
-    else
-    {
+        break;
+    default:
         stars = NULL;
+        break;
     }
     return stars;
 }
 
-void PrintRollNumbers(struct Student students[], int numberOfStudents, int index)
+void PrintRollNumbers(const struct Student students[], const int numberOfStudents, int index)
 {
     if (index == numberOfStudents)
     {
@@ -78,7 +76,8 @@ int main()
 
     for (int index = 0; index < numberOfStudents; index++)
     {
-        scanf("%d %s %d %d %d", &students[index].rollNumber, students[index].name, &students[index].mark1, &students[index].mark2, &students[index].mark3);
+        scanf("%d %s %d %d %d", &students[index].rollNumber, students[index].name,
+              &students[index].mark1, &students[index].mark2, &students[index].mark3);
     }
 
     for (int i = 0; i < numberOfStudents - 1; i++)
@@ -97,8 +96,9 @@ int main()
     for (int index = 0; index < numberOfStudents; index++)
     {
         int totalMarks = students[index].mark1 + students[index].mark2 + students[index].mark3;
-        float averageMarks = totalMarks / 3.0;
-        char grade = GradeCalculator(averageMarks);
+        const float averageMarks = totalMarks / 3.0f;
+        const char grade = GradeCalculator(averageMarks);
+        const char *stars = GetStar(grade);
 
         printf("\nRoll: %d\n", students[index].rollNumber);
         printf("Name: %s\n", students[index].name);
@@ -106,7 +106,6 @@ int main()
         printf("Average: %.2f\n", averageMarks);
         printf("Grade: %c\n", grade);
 
-        const char *stars = GetStar(grade);
         if (stars != NULL)
         {
             printf("Performance: %s\n", stars);
