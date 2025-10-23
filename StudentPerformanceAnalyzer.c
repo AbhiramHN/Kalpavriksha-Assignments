@@ -11,15 +11,25 @@ char gradeCalculator(const float averageMarks)
 {
     char grade;
     if (averageMarks >= 85)
+    {
         grade = 'A';
+    }
     else if (averageMarks >= 70)
+    {
         grade = 'B';
+    }
     else if (averageMarks >= 50)
+    {
         grade = 'C';
+    }
     else if (averageMarks >= 35)
+    {
         grade = 'D';
+    }
     else
+    {
         grade = 'F';
+    }
     return grade;
 }
 
@@ -28,11 +38,31 @@ void printStars(const char grade)
     int stars;
     switch (grade)
     {
-    case 'A': stars = 5; break;
-    case 'B': stars = 4; break;
-    case 'C': stars = 3; break;
-    case 'D': stars = 2; break;
-    default: stars = 0; break;
+        case 'A':
+        {
+            stars = 5;
+            break;
+        }
+        case 'B':
+        {
+            stars = 4;
+            break;
+        }
+        case 'C':
+        {
+            stars = 3;
+            break;
+        }
+        case 'D':
+        {
+            stars = 2;
+            break;
+        }
+        default:
+        {
+            stars = 0;
+            break;
+        }
     }
 
     printf("Performance: ");
@@ -88,10 +118,12 @@ void calculateResults(const Student students[], const int numberOfStudents)
         printf("Total: %d\n", totalMarks);
         printf("Average: %.2f\n", averageMarks);
         printf("Grade: %c \n", grade);
+
         if (averageMarks < 35)
         {
             continue;
         }
+
         printStars(grade);
         printf("\n");
     }
@@ -103,6 +135,7 @@ void printRollNumbers(const Student students[], const int numberOfStudents, int 
     {        
         return;
     }
+
     printf("%d ", students[index].rollNumber);
     printRollNumbers(students, numberOfStudents, index + 1);
 }
