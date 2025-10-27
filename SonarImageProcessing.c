@@ -6,31 +6,51 @@
 
 void printMatrix(int (*mat)[MAX_SIZE], int size)
 {
+    if (!mat)
+    {
+        printf("Error: Null matrix pointer in printMatrix.\n");
+        return;
+    }
     for (int row = 0; row < size; row++)
     {
         for (int column = 0; column < size; column++)
         {
-            printf("%3d ", *(*(mat + row) + column));
+            printf("%4d ", *(*(mat + row) + column));
         }
         printf("\n");
     }
 }
 
-void rotateMatrix(int (*mat)[MAX_SIZE], int size)
+void transposeMatrix(int (*mat)[MAX_SIZE], int size)
 {
-    int i, j, temp;
-    for (i = 0; i < size; i++)
+    if (!mat)
     {
-        for (j = i + 1; j < size; j++)
+        printf("Error: Null matrix pointer in transposeMatrix.\n");
+        return;
+    }
+    int temp;
+    for (int i = 0; i < size; i++)
+    {
+        for (int j = i + 1; j < size; j++)
         {
             temp = *(*(mat + i) + j);
             *(*(mat + i) + j) = *(*(mat + j) + i);
             *(*(mat + j) + i) = temp;
         }
     }
-    for (i = 0; i < size; i++)
+}
+
+void reverseRows(int (*mat)[MAX_SIZE], int size)
+{
+    if (!mat)
     {
-        for (j = 0; j < size / 2; j++)
+        printf("Error: Null matrix pointer in reverseRows.\n");
+        return;
+    }
+    int temp;
+    for (int i = 0; i < size; i++)
+    {
+        for (int j = 0; j < size / 2; j++)
         {
             temp = *(*(mat + i) + j);
             *(*(mat + i) + j) = *(*(mat + i) + (size - 1 - j));
@@ -39,28 +59,49 @@ void rotateMatrix(int (*mat)[MAX_SIZE], int size)
     }
 }
 
-void applySmoothing(int (*mat)[MAX_SIZE], const int size)
+void rotateMatrix(int (*mat)[MAX_SIZE], int size)
 {
+    if (!mat)
+    {
+        printf("Error: Null matrix pointer in rotateMatrix.\n");
+        return;
+    }
+    transposeMatrix(mat, size);
+    reverseRows(mat, size);
+}
+
+void smoothCell(int (*mat)[MAX_SIZE], int size, int row, int column)
+{
+    int sum = 0, count = 0;
+    for (int i = -1; i <= 1; i++)
+    {
+        for (int j = -1; j <= 1; j++)
+        {
+            int r = row + i;
+            int c = column + j;
+            if (r >= 0 && r < size && c >= 0 && c < size)
+            {
+                sum += *(*(mat + r) + c) & 0xFF;
+                count++;
+            }
+        }
+    }
+    int newValue = sum / count;
+    *(*(mat + row) + column) = *(*(mat + row) + column) | (newValue << 8);
+}
+
+void applySmoothing(int (*mat)[MAX_SIZE], int size)
+{
+    if (!mat)
+    {
+        printf("Error: Null matrix pointer in applySmoothing.\n");
+        return;
+    }
     for (int row = 0; row < size; row++)
     {
         for (int column = 0; column < size; column++)
         {
-            int sum = 0, count = 0;
-            for (int i = -1; i <= 1; i++)
-            {
-                for (int j = -1; j <= 1; j++)
-                {
-                    int r = row + i;
-                    int c = column + j;
-                    if (r >= 0 && r < size && c >= 0 && c < size)
-                    {
-                        sum += *(*(mat + r) + c) & 0xFF;
-                        count++;
-                    }
-                }
-            }
-            int newValue = sum / count;
-            *(*(mat + row) + column) = *(*(mat + row) + column) | (newValue << 8);
+            smoothCell(mat, size, row, column);
         }
     }
     for (int row = 0; row < size; row++)
@@ -80,13 +121,18 @@ int getMatrixSize()
     if (matrixSize < 2 || matrixSize > 10)
     {
         printf("Invalid size! Please enter a value between 2 and 10.\n");
-        exit(1);
+        return -1; 
     }
     return matrixSize;
 }
 
 void fillRandomMatrix(int (*mat)[MAX_SIZE], int size)
 {
+    if (!mat)
+    {
+        printf("Error: Null matrix pointer in fillRandomMatrix.\n");
+        return;
+    }
     for (int row = 0; row < size; row++)
     {
         for (int column = 0; column < size; column++)
@@ -98,6 +144,11 @@ void fillRandomMatrix(int (*mat)[MAX_SIZE], int size)
 
 void displayMatrix(const char *title, int (*mat)[MAX_SIZE], int size)
 {
+    if (!mat)
+    {
+        printf("Error: Null matrix pointer in displayMatrix.\n");
+        return;
+    }
     printf("\n%s\n", title);
     printMatrix(mat, size);
 }
@@ -110,6 +161,8 @@ int main()
     srand(time(NULL));
 
     matrixSize = getMatrixSize();
+    if (matrixSize == -1)
+        return 1; 
 
     fillRandomMatrix(matrix, matrixSize);
 
@@ -122,6 +175,6 @@ int main()
     applySmoothing(matrix, matrixSize);
 
     displayMatrix("Matrix after Applying 3x3 Smoothing Filter:", matrix, matrixSize);
-    
+
     return 0;
 }
