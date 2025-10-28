@@ -121,7 +121,7 @@ int getMatrixSize()
     if (matrixSize < 2 || matrixSize > 10)
     {
         printf("Invalid size! Please enter a value between 2 and 10.\n");
-        return -1; 
+        return -1;
     }
     return matrixSize;
 }
@@ -156,25 +156,32 @@ void displayMatrix(const char *title, int (*mat)[MAX_SIZE], int size)
 int main()
 {
     int matrixSize;
-    int matrix[MAX_SIZE][MAX_SIZE];
+    int (*matrix)[MAX_SIZE] = NULL; 
 
     srand(time(NULL));
 
     matrixSize = getMatrixSize();
     if (matrixSize == -1)
-        return 1; 
+        return 1;
+
+
+    matrix = malloc(matrixSize * sizeof(*matrix));
+    if (!matrix)
+    {
+        printf("Memory allocation failed!\n");
+        return 1;
+    }
 
     fillRandomMatrix(matrix, matrixSize);
-
     displayMatrix("Original Randomly Generated Matrix:", matrix, matrixSize);
 
     rotateMatrix(matrix, matrixSize);
-
     displayMatrix("Matrix after 90° Clockwise Rotation:", matrix, matrixSize);
 
     applySmoothing(matrix, matrixSize);
-
     displayMatrix("Matrix after Applying 3x3 Smoothing Filter:", matrix, matrixSize);
+
+    free(matrix);
 
     return 0;
 }
