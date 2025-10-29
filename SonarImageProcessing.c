@@ -4,111 +4,124 @@
 
 #define MAX_SIZE 10
 
-void printMatrix(int (*mat)[MAX_SIZE], int size)
+void printMatrix(int *matrix, const int size)
 {
-    if (!mat)
+    if (!matrix)
     {
         printf("Error: Null matrix pointer in printMatrix.\n");
-        return;
     }
-    for (int row = 0; row < size; row++)
+    else
     {
-        for (int column = 0; column < size; column++)
+        for (int row = 0; row < size; row++)
         {
-            printf("%4d ", *(*(mat + row) + column));
+            for (int column = 0; column < size; column++)
+            {
+                printf("%4d ", *(matrix + row * size + column));
+            }
+            printf("\n");
         }
-        printf("\n");
     }
 }
 
-void transposeMatrix(int (*mat)[MAX_SIZE], int size)
+void transposeMatrix(int *matrix, const int size)
 {
-    if (!mat)
+    if (!matrix)
     {
         printf("Error: Null matrix pointer in transposeMatrix.\n");
-        return;
     }
-    int temp;
-    for (int i = 0; i < size; i++)
+    else
     {
-        for (int j = i + 1; j < size; j++)
+        for (int row = 0; row < size; row++)
         {
-            temp = *(*(mat + i) + j);
-            *(*(mat + i) + j) = *(*(mat + j) + i);
-            *(*(mat + j) + i) = temp;
+            for (int column = row + 1; column < size; column++)
+            {
+                int temp = *(matrix + row * size + column);
+                *(matrix + row * size + column) = *(matrix + column * size + row);
+                *(matrix + column * size + row) = temp;
+            }
         }
     }
 }
 
-void reverseRows(int (*mat)[MAX_SIZE], int size)
+void reverseRows(int *matrix, const int size)
 {
-    if (!mat)
+    if (!matrix)
     {
         printf("Error: Null matrix pointer in reverseRows.\n");
-        return;
     }
-    int temp;
-    for (int i = 0; i < size; i++)
+    else
     {
-        for (int j = 0; j < size / 2; j++)
+        for (int row = 0; row < size; row++)
         {
-            temp = *(*(mat + i) + j);
-            *(*(mat + i) + j) = *(*(mat + i) + (size - 1 - j));
-            *(*(mat + i) + (size - 1 - j)) = temp;
+            for (int column = 0; column < size / 2; column++)
+            {
+                int temp = *(matrix + row * size + column);
+                *(matrix + row * size + column) = *(matrix + row * size + (size - 1 - column));
+                *(matrix + row * size + (size - 1 - column)) = temp;
+            }
         }
     }
 }
 
-void rotateMatrix(int (*mat)[MAX_SIZE], int size)
+void rotateMatrix(int *matrix, const int size)
 {
-    if (!mat)
+    if (!matrix)
     {
         printf("Error: Null matrix pointer in rotateMatrix.\n");
-        return;
     }
-    transposeMatrix(mat, size);
-    reverseRows(mat, size);
+    else
+    {
+        transposeMatrix(matrix, size);
+        reverseRows(matrix, size);
+    }
 }
 
-void smoothCell(int (*mat)[MAX_SIZE], int size, int row, int column)
+void smoothCell(int *matrix, const int size, int row, int column)
 {
-    int sum = 0, count = 0;
-    for (int i = -1; i <= 1; i++)
+    int sum = 0;
+    int count = 0;
+
+    for (int dr = -1; dr <= 1; dr++)
     {
-        for (int j = -1; j <= 1; j++)
+        for (int dc = -1; dc <= 1; dc++)
         {
-            int r = row + i;
-            int c = column + j;
+            int r = row + dr;
+            int c = column + dc;
+
             if (r >= 0 && r < size && c >= 0 && c < size)
             {
-                sum += *(*(mat + r) + c) & 0xFF;
+                sum += *(matrix + r * size + c) & 0xFF;
                 count++;
             }
         }
     }
+
     int newValue = sum / count;
-    *(*(mat + row) + column) = *(*(mat + row) + column) | (newValue << 8);
+    *(matrix + row * size + column) = *(matrix + row * size + column) | (newValue << 8);
 }
 
-void applySmoothing(int (*mat)[MAX_SIZE], int size)
+void applySmoothing(int *matrix, const int size)
 {
-    if (!mat)
+    if (!matrix)
     {
         printf("Error: Null matrix pointer in applySmoothing.\n");
-        return;
     }
-    for (int row = 0; row < size; row++)
+    else
     {
-        for (int column = 0; column < size; column++)
+        for (int row = 0; row < size; row++)
         {
-            smoothCell(mat, size, row, column);
+            for (int column = 0; column < size; column++)
+            {
+                smoothCell(matrix, size, row, column);
+            }
         }
-    }
-    for (int row = 0; row < size; row++)
-    {
-        for (int column = 0; column < size; column++)
+
+        for (int row = 0; row < size; row++)
         {
-            *(*(mat + row) + column) = (*(*(mat + row) + column) >> 8) & 0xFF;
+            for (int column = 0; column < size; column++)
+            {
+                *(matrix + row * size + column) = (*(matrix + row * size + column) >> 8) & 0xFF;
+            }
         }
     }
 }
@@ -116,56 +129,67 @@ void applySmoothing(int (*mat)[MAX_SIZE], int size)
 int getMatrixSize()
 {
     int matrixSize;
+
     printf("Enter matrix size (2-10): ");
     scanf("%d", &matrixSize);
+
     if (matrixSize < 2 || matrixSize > 10)
     {
         printf("Invalid size! Please enter a value between 2 and 10.\n");
         return -1;
     }
-    return matrixSize;
+    else
+    {
+        return matrixSize;
+    }
 }
 
-void fillRandomMatrix(int (*mat)[MAX_SIZE], int size)
+void fillRandomMatrix(int *matrix, const int size)
 {
-    if (!mat)
+    if (!matrix)
     {
         printf("Error: Null matrix pointer in fillRandomMatrix.\n");
-        return;
     }
-    for (int row = 0; row < size; row++)
+    else
     {
-        for (int column = 0; column < size; column++)
+        for (int row = 0; row < size; row++)
         {
-            *(*(mat + row) + column) = rand() % 256;
+            for (int column = 0; column < size; column++)
+            {
+                *(matrix + row * size + column) = rand() % 256;
+            }
         }
     }
 }
 
-void displayMatrix(const char *title, int (*mat)[MAX_SIZE], int size)
+void displayMatrix(const char *title, int *matrix, const int size)
 {
-    if (!mat)
+    if (!matrix)
     {
         printf("Error: Null matrix pointer in displayMatrix.\n");
-        return;
     }
-    printf("\n%s\n", title);
-    printMatrix(mat, size);
+    else
+    {
+        printf("\n%s\n", title);
+        printMatrix(matrix, size);
+    }
 }
 
 int main()
 {
     int matrixSize;
-    int (*matrix)[MAX_SIZE] = NULL; 
 
     srand(time(NULL));
 
     matrixSize = getMatrixSize();
+
     if (matrixSize == -1)
+    {
         return 1;
+    }
 
+    int *matrix = malloc(matrixSize * matrixSize * sizeof(int));
 
-    matrix = malloc(matrixSize * sizeof(*matrix));
     if (!matrix)
     {
         printf("Memory allocation failed!\n");
