@@ -136,13 +136,12 @@ int getMatrixSize()
     if (matrixSize < 2 || matrixSize > 10)
     {
         printf("Invalid size! Please enter a value between 2 and 10.\n");
-        return -1;
+        matrixSize = -1;
     }
-    else
-    {
-        return matrixSize;
-    }
+
+    return matrixSize;
 }
+
 
 void fillRandomMatrix(int *matrix, const int size)
 {
@@ -180,9 +179,7 @@ int main()
     int matrixSize;
 
     srand(time(NULL));
-
     matrixSize = getMatrixSize();
-
     if (matrixSize == -1)
     {
         return 1;
@@ -206,6 +203,5 @@ int main()
     displayMatrix("Matrix after Applying 3x3 Smoothing Filter:", matrix, matrixSize);
 
     free(matrix);
-
     return 0;
 }
