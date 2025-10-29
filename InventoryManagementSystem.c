@@ -12,6 +12,18 @@ typedef struct
     int quantity;
 } Product;
 
+enum MenuOptions
+{
+    ADD_PRODUCT = 1,
+    VIEW_PRODUCTS,
+    UPDATE_QUANTITY,
+    SEARCH_BY_ID,
+    SEARCH_BY_NAME,
+    SEARCH_BY_PRICE_RANGE,
+    DELETE_PRODUCT,
+    EXIT_PROGRAM
+};
+
 Product *createInitialProducts(int *count)
 {
     printf("Enter initial number of products: ");
@@ -31,8 +43,15 @@ Product *createInitialProducts(int *count)
         scanf("%d", &products[index].productId);
         printf("Product Name: ");
         scanf("%s", products[index].productName);
-        printf("Product Price: ");
-        scanf("%f", &products[index].price);
+
+        do
+        {
+            printf("Product Price: ");
+            scanf("%f", &products[index].price);
+            if (products[index].price <= 0)
+                printf("Invalid price! Enter a positive value.\n");
+        } while (products[index].price <= 0);
+
         printf("Product Quantity: ");
         scanf("%d", &products[index].quantity);
     }
@@ -84,8 +103,15 @@ void addNewProduct(Product **products, int *count)
     scanf("%d", &(*products)[*count].productId);
     printf("Product Name: ");
     scanf("%s", (*products)[*count].productName);
-    printf("Product Price: ");
-    scanf("%f", &(*products)[*count].price);
+
+    do
+    {
+        printf("Product Price: ");
+        scanf("%f", &(*products)[*count].price);
+        if ((*products)[*count].price <= 0)
+            printf("Invalid price! Enter a positive value.\n");
+    } while ((*products)[*count].price <= 0);
+
     printf("Product Quantity: ");
     scanf("%d", &(*products)[*count].quantity);
 
@@ -160,10 +186,21 @@ void searchProductByName(const Product *products, int count)
 void searchProductByPriceRange(const Product *products, int count)
 {
     float minPrice, maxPrice;
-    printf("Enter minimum price: ");
-    scanf("%f", &minPrice);
-    printf("Enter maximum price: ");
-    scanf("%f", &maxPrice);
+    do
+    {
+        printf("Enter minimum price: ");
+        scanf("%f", &minPrice);
+        if (minPrice < 0)
+            printf("Invalid! Minimum price must be non-negative.\n");
+    } while (minPrice < 0);
+
+    do
+    {
+        printf("Enter maximum price: ");
+        scanf("%f", &maxPrice);
+        if (maxPrice <= 0)
+            printf("Invalid! Maximum price must be positive.\n");
+    } while (maxPrice <= 0);
 
     int found = 0;
     printf("\nProducts in price range:\n");
@@ -216,40 +253,41 @@ void deleteProductById(Product **products, int *count)
     }
 }
 
-void freeMemory(Product *products)
-{
-    free(products);
-    printf("\nMemory released successfully....\n");
+void freeMemory(Product **products) {
+    free(*products);
+    *products = NULL; // changes the actual pointer in main
 }
+
 
 void handleUserChoice(Product **products, int *count, int choice)
 {
     switch (choice)
     {
-    case 1:
+    case ADD_PRODUCT:
         addNewProduct(products, count);
         break;
-    case 2:
+    case VIEW_PRODUCTS:
         viewAllProducts(*products, *count);
         break;
-    case 3:
+    case UPDATE_QUANTITY:
         updateQuantity(*products, *count);
         break;
-    case 4:
+    case SEARCH_BY_ID:
         searchProductById(*products, *count);
         break;
-    case 5:
+    case SEARCH_BY_NAME:
         searchProductByName(*products, *count);
         break;
-    case 6:
+    case SEARCH_BY_PRICE_RANGE:
         searchProductByPriceRange(*products, *count);
         break;
-    case 7:
+    case DELETE_PRODUCT:
         deleteProductById(products, count);
         break;
-    case 8:
-        freeMemory(*products);
+    case EXIT_PROGRAM:
+        freeMemory(products);
         exit(0);
+
     default:
         printf("Invalid choice.\n");
     }
