@@ -1,21 +1,21 @@
-#include "../inc/commandParser.h"
-#include "../inc/file.h"
-#include "../inc/directory.h"
+#include "commandParser.h"
+#include "file.h"
+#include "directory.h"
 
 enum Command getCommandID(const char* cmd)
 {
-    if (strcmp(cmd, "mkdir") == 0) return CMD_MKDIR;
-    if (strcmp(cmd, "create") == 0) return CMD_CREATE;
-    if (strcmp(cmd, "write") == 0) return CMD_WRITE;
-    if (strcmp(cmd, "read") == 0) return CMD_READ;
-    if (strcmp(cmd, "delete") == 0) return CMD_DELETE;
-    if (strcmp(cmd, "rmdir") == 0) return CMD_RMDIR;
-    if (strcmp(cmd, "ls") == 0) return CMD_LS;
-    if (strcmp(cmd, "cd") == 0) return CMD_CD;
-    if (strcmp(cmd, "pwd") == 0) return CMD_PWD;
-    if (strcmp(cmd, "df") == 0) return CMD_DF;
-    if (strcmp(cmd, "exit") == 0) return CMD_EXIT;
-    return CMD_INVALID;
+    if (strcmp(cmd, "mkdir") == 0) return MKDIR;
+    if (strcmp(cmd, "create") == 0) return CREATE;
+    if (strcmp(cmd, "write") == 0) return WRITE;
+    if (strcmp(cmd, "read") == 0) return READ;
+    if (strcmp(cmd, "delete") == 0) return DELETE;
+    if (strcmp(cmd, "rmdir") == 0) return RMDIR;
+    if (strcmp(cmd, "ls") == 0) return LS;
+    if (strcmp(cmd, "cd") == 0) return CD;
+    if (strcmp(cmd, "pwd") == 0) return PWD;
+    if (strcmp(cmd, "df") == 0) return DF;
+    if (strcmp(cmd, "exit") == 0) return EXIT;
+    return INVALID;
 }
 
 void parseUserInput(char* input, char* args[])
@@ -41,68 +41,68 @@ void handleCommand(enum Command cmd, char* args[], char* raw, FileNode** cwd, Fi
 {
     switch (cmd)
     {
-        case CMD_MKDIR:
+        case MKDIR:
             if (!args[1])
                 printf("Usage: mkdir <dirname>\n");
             else
                 makeDirectory(*cwd, args[1]);
             break;
 
-        case CMD_CREATE:
+        case CREATE:
             if (!args[1])
                 printf("Usage: create <filename>\n");
             else
                 createFile(*cwd, args[1]);
             break;
 
-        case CMD_WRITE:
+        case WRITE:
             if (!args[1])
                 printf("Usage: write <filename> <text>\n");
             else
                 writeFile(*cwd, raw, head);
             break;
 
-        case CMD_READ:
+        case READ:
             if (!args[1])
                 printf("Usage: read <filename>\n");
             else
                 readFile(*cwd, args[1]);
             break;
 
-        case CMD_DELETE:
+        case DELETE:
             if (!args[1])
                 printf("Usage: delete <filename>\n");
             else
                 deleteFile(*cwd, args[1], head);
             break;
 
-        case CMD_RMDIR:
+        case RMDIR:
             if (!args[1])
                 printf("Usage: rmdir <dirname>\n");
             else
                 removeDirectory(*cwd, args[1]);
             break;
 
-        case CMD_LS:
+        case LS:
             listDirectory(*cwd);
             break;
 
-        case CMD_CD:
+        case CD:
             if (!args[1])
                 printf("Usage: cd <dirname>\n");
             else
                 changeDirectory(cwd, args[1]);
             break;
 
-        case CMD_PWD:
+        case PWD:
             printWorkingDirectory(*cwd);
             break;
 
-        case CMD_DF:
+        case DF:
             showDiskStatus();
             break;
 
-        case CMD_EXIT:
+        case EXIT:
             *run = 0;
             printf("Exiting Virtual File System...\n");
             break;

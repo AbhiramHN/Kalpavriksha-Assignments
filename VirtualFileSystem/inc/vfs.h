@@ -32,21 +32,21 @@ typedef struct FileNode
 
 enum Command
 {
-    CMD_INVALID = -1,
-    CMD_MKDIR,
-    CMD_CREATE,
-    CMD_WRITE,
-    CMD_READ,
-    CMD_DELETE,
-    CMD_RMDIR,
-    CMD_LS,
-    CMD_CD,
-    CMD_PWD,
-    CMD_DF,
-    CMD_EXIT
+    INVALID = -1,
+    MKDIR,
+    CREATE,
+    WRITE,
+    READ,
+    DELETE,
+    RMDIR,
+    LS,
+    CD,
+    PWD,
+    DF,
+    EXIT
 };
 
-// Function declarations
+
 
 FreeBlock* initializeFreeBlockList();
 

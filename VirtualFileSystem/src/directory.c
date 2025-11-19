@@ -1,4 +1,4 @@
-#include "../inc/directory.h"
+#include "directory.h"
 
 void makeDirectory(FileNode* cwd, const char* dirName)
 {

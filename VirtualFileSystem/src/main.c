@@ -1,6 +1,6 @@
-#include "../inc/commandParser.h"
-#include "../inc/file.h"
-#include "../inc/directory.h"
+#include "commandParser.h"
+#include "file.h"
+#include "directory.h"
 
 FreeBlock* initializeFreeBlockList()
 {

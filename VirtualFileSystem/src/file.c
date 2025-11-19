@@ -1,4 +1,4 @@
-#include "../inc/file.h"
+#include "file.h"
 
 char virtualDisk[NUM_BLOCKS][BLOCK_SIZE];
 int totalFreeBlocks = NUM_BLOCKS;
