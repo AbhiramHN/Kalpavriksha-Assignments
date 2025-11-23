@@ -61,9 +61,15 @@ PlayerNode* convertToNode(const Player data)
 {
     PlayerNode* n = malloc(sizeof(PlayerNode));
     n->playerId = data.id;
-    strcpy(n->name, data.name);
-    strcpy(n->teamName, data.team);
-    strcpy(n->role, data.role);
+
+    strncpy(n->name, data.name, sizeof(n->name) - 1);
+    n->name[sizeof(n->name) - 1] = '\0';
+
+    strncpy(n->teamName, data.team, sizeof(n->teamName) - 1);
+    n->teamName[sizeof(n->teamName) - 1] = '\0';
+
+    strncpy(n->role, data.role, sizeof(n->role) - 1);
+    n->role[sizeof(n->role) - 1] = '\0';
     n->totalRuns = data.totalRuns;
     n->battingAverage = data.battingAverage;
     n->strikeRate = data.strikeRate;
@@ -95,8 +101,10 @@ void insertPlayer(PlayerNode** head, const Player data)
 
 void safeReadString(char* buf, int size)
 {
-    fgets(buf, size, stdin);
-    removeNewline(buf);
+    if (fgets(buf, size, stdin) != NULL)
+    {
+        removeNewline(buf);
+    }
 }
 
 PlayerNode* createNewPlayerNode()
