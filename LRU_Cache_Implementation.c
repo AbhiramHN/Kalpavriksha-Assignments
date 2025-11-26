@@ -16,7 +16,7 @@ typedef struct HashEntry
 {
     int key;
     Node *node;
-    int isUsed;
+    int state; 
 } HashEntry;
 
 typedef struct LRUCache
@@ -27,8 +27,6 @@ typedef struct LRUCache
     Node *tail;
     HashEntry table[HASH_SIZE];
 } LRUCache;
-
-LRUCache *cacheInstance = NULL;
 
 unsigned long hashFunction(int key)
 {
@@ -42,8 +40,19 @@ unsigned long hashFunction(int key)
 Node *createNode(int key, const char *valueText)
 {
     Node *newNode = malloc(sizeof(Node));
-    newNode->key = key;
+    if (newNode == NULL)
+    {
+        return NULL;
+    }
+
     newNode->value = malloc(strlen(valueText) + 1);
+    if (newNode->value == NULL)
+    {
+        free(newNode);
+        return NULL;
+    }
+
+    newNode->key = key;
     strcpy(newNode->value, valueText);
     newNode->prev = NULL;
     newNode->next = NULL;
@@ -53,6 +62,11 @@ Node *createNode(int key, const char *valueText)
 LRUCache *createCache(int capacity)
 {
     LRUCache *cache = malloc(sizeof(LRUCache));
+    if (cache == NULL)
+    {
+        return NULL;
+    }
+
     cache->capacity = capacity;
     cache->size = 0;
     cache->head = NULL;
@@ -60,7 +74,7 @@ LRUCache *createCache(int capacity)
 
     for (int slot = 0; slot < HASH_SIZE; slot++)
     {
-        cache->table[slot].isUsed = 0;
+        cache->table[slot].state = 0;
         cache->table[slot].key = 0;
         cache->table[slot].node = NULL;
     }
@@ -120,12 +134,12 @@ Node *hashGet(LRUCache *cache, int key)
 
     while (1)
     {
-        if (cache->table[index].isUsed == 0)
+        if (cache->table[index].state == 0)
         {
             return NULL;
         }
 
-        if (cache->table[index].key == key)
+        if (cache->table[index].state == 1 && cache->table[index].key == key)
         {
             return cache->table[index].node;
         }
@@ -142,7 +156,7 @@ void hashInsert(LRUCache *cache, int key, Node *node)
 {
     unsigned long index = hashFunction(key);
 
-    while (cache->table[index].isUsed == 1)
+    while (cache->table[index].state == 1)
     {
         if (cache->table[index].key == key)
         {
@@ -152,7 +166,7 @@ void hashInsert(LRUCache *cache, int key, Node *node)
         index = (index + 1) % HASH_SIZE;
     }
 
-    cache->table[index].isUsed = 1;
+    cache->table[index].state = 1;
     cache->table[index].key = key;
     cache->table[index].node = node;
 }
@@ -161,11 +175,11 @@ void removeFromHash(LRUCache *cache, int key)
 {
     unsigned long index = hashFunction(key);
 
-    while (cache->table[index].isUsed == 1)
+    while (cache->table[index].state != 0)
     {
-        if (cache->table[index].key == key)
+        if (cache->table[index].state == 1 && cache->table[index].key == key)
         {
-            cache->table[index].isUsed = 0;
+            cache->table[index].state = 2;
             cache->table[index].node = NULL;
             return;
         }
@@ -183,40 +197,67 @@ void evict(LRUCache *cache)
     cache->size--;
 }
 
-char *cacheGet(int key)
+char *cacheGet(LRUCache *cache, int key)
 {
-    Node *node = hashGet(cacheInstance, key);
+    Node *node = hashGet(cache, key);
     if (node == NULL)
     {
         return NULL;
     }
-    moveToFront(cacheInstance, node);
+    moveToFront(cache, node);
     return node->value;
 }
 
-void cachePut(int key, const char *valueText)
+void cachePut(LRUCache *cache, int key, const char *valueText)
 {
-    Node *existing = hashGet(cacheInstance, key);
+    Node *existing = hashGet(cache, key);
 
     if (existing != NULL)
     {
+        char *newVal = malloc(strlen(valueText) + 1);
+        if (newVal == NULL)
+        {
+            return;
+        }
+
         free(existing->value);
-        existing->value = malloc(strlen(valueText) + 1);
+        existing->value = newVal;
         strcpy(existing->value, valueText);
-        moveToFront(cacheInstance, existing);
+
+        moveToFront(cache, existing);
         return;
     }
 
     Node *newNode = createNode(key, valueText);
-    addToFront(cacheInstance, newNode);
-    hashInsert(cacheInstance, key, newNode);
-    cacheInstance->size++;
-
-    if (cacheInstance->size > cacheInstance->capacity)
+    if (newNode == NULL)
     {
-        evict(cacheInstance);
+        return;
+    }
+
+    addToFront(cache, newNode);
+    hashInsert(cache, key, newNode);
+    cache->size++;
+
+    if (cache->size > cache->capacity)
+    {
+        evict(cache);
     }
 }
+
+void deleteCache(LRUCache *cache)
+{
+    Node *temp = cache->head;
+    while (temp != NULL)
+    {
+        Node *next = temp->next;
+        free(temp->value);
+        free(temp);
+        temp = next;
+    }
+    free(cache);
+}
+
+LRUCache *cacheInstance = NULL;
 
 void processCommand(const char *command)
 {
@@ -231,13 +272,13 @@ void processCommand(const char *command)
         int key;
         char buffer[200];
         scanf("%d %199s", &key, buffer);
-        cachePut(key, buffer);
+        cachePut(cacheInstance, key, buffer);
     }
     else if (strcmp(command, "get") == 0)
     {
         int key;
         scanf("%d", &key);
-        char *result = cacheGet(key);
+        char *result = cacheGet(cacheInstance, key);
 
         if (result == NULL)
         {
@@ -250,6 +291,7 @@ void processCommand(const char *command)
     }
     else if (strcmp(command, "exit") == 0)
     {
+        deleteCache(cacheInstance);
         exit(0);
     }
 }
