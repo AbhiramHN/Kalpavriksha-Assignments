@@ -29,8 +29,6 @@ typedef struct
 
 } PCB;
 
-
-
 typedef struct Node
 {
     PCB *process;
@@ -82,7 +80,6 @@ PCB *dequeue(Queue *q)
     PCB *p = temp->process;
 
     q->front = q->front->next;
-
     if (q->front == NULL)
     {
         q->rear = NULL;
@@ -91,7 +88,6 @@ PCB *dequeue(Queue *q)
     free(temp);
     return p;
 }
-
 
 void removeFromQueue(Queue *q, PCB *target)
 {
@@ -117,8 +113,6 @@ void removeFromQueue(Queue *q, PCB *target)
     }
 }
 
-
-
 typedef struct HashNode
 {
     int key;
@@ -139,7 +133,9 @@ int hash(int key)
 void initHashMap(HashMap *map)
 {
     for (int i = 0; i < HASH_SIZE; i++)
+    {
         map->table[i] = NULL;
+    }
 }
 
 void insertProcess(HashMap *map, PCB *p)
@@ -162,29 +158,21 @@ PCB *findProcess(HashMap *map, int pid)
     while (cur != NULL)
     {
         if (cur->key == pid)
+        {
             return cur->value;
+        }
         cur = cur->next;
     }
     return NULL;
 }
 
-
-
-void runScheduler(
-    Queue *readyQueue,
-    Queue *waitingQueue,
-    Queue *terminatedQueue,
-    HashMap *map,
-    int killPid[],
-    int killTime[],
-    int killCount)
+void runScheduler(Queue *readyQueue, Queue *waitingQueue, Queue *terminatedQueue, HashMap *map, int killPid[], int killTime[], int killCount)
 {
     int clock = 0;
     PCB *running = NULL;
 
     while (!isQueueEmpty(readyQueue) || !isQueueEmpty(waitingQueue) || running != NULL)
     {
-      
         for (int i = 0; i < killCount; i++)
         {
             if (killTime[i] == clock)
@@ -195,7 +183,6 @@ void runScheduler(
                     p->isKilled = 1;
                     p->completionTime = clock;
 
-             
                     if (running == p)
                         running = NULL;
 
@@ -207,29 +194,21 @@ void runScheduler(
             }
         }
 
-   
         if (running == NULL)
         {
             running = dequeue(readyQueue);
         }
 
-       
-        int executedThisTick = 0;
-
-        if (running != NULL && !running->isKilled)
+        if (running != NULL && !running->isKilled && running->remainingBurst > 0)
         {
+            running->remainingBurst--;
+
             int executed = running->burstTime - running->remainingBurst;
 
             if (!running->ioStarted && executed == running->ioStartTime)
             {
-                /* I/O starts AFTER this tick ends */
                 running->ioStarted = 1;
                 running->remainingIo = running->ioDuration;
-            }
-            else
-            {
-                running->remainingBurst--;
-                executedThisTick = 1;
             }
         }
 
@@ -239,25 +218,20 @@ void runScheduler(
         while (!isQueueEmpty(waitingQueue))
         {
             PCB *p = dequeue(waitingQueue);
-
             p->remainingIo--;
 
             if (p->remainingIo == 0)
+            {
                 enqueue(readyQueue, p);
+            }
             else
+            {
                 enqueue(&tempQueue, p);
+            }
         }
 
         waitingQueue->front = tempQueue.front;
         waitingQueue->rear = tempQueue.rear;
-
-     
-        if (running != NULL && running->ioStarted && executedThisTick == 0)
-        {
-            enqueue(waitingQueue, running);
-            running = NULL;
-        }
-
 
         if (running != NULL && running->remainingBurst == 0 && !running->isKilled)
         {
@@ -265,13 +239,16 @@ void runScheduler(
             enqueue(terminatedQueue, running);
             running = NULL;
         }
+        else if (running != NULL && running->ioStarted)
+        {
+            enqueue(waitingQueue, running);
+            running = NULL;
+        }
 
         sleep(1);
         clock++;
     }
 }
-
-
 
 void printReport(Queue *terminatedQueue)
 {
@@ -293,8 +270,6 @@ void printReport(Queue *terminatedQueue)
                p->waitingTime);
     }
 }
-
-
 
 int main()
 {
@@ -323,7 +298,6 @@ int main()
         p->remainingBurst = p->burstTime;
         p->ioStarted = 0;
         p->remainingIo = 0;
-
         p->arrivalTime = 0;
         p->isKilled = 0;
 
@@ -336,9 +310,12 @@ int main()
 
     int killPid[killCount], killTime[killCount];
     for (int i = 0; i < killCount; i++)
+    {
         scanf("%d %d", &killPid[i], &killTime[i]);
+    }
 
     runScheduler(&readyQueue, &waitingQueue, &terminatedQueue, &map, killPid, killTime, killCount);
+
     printReport(&terminatedQueue);
 
     return 0;
